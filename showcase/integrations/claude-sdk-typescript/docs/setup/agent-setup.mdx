@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    npm install @ag-ui/claude-agent-sdk @ag-ui/core @ag-ui/encoder @anthropic-ai/claude-agent-sdk @anthropic-ai/sdk
+    ```
+
+  </Step>
+  <Step>
+    ### Run through the official AG-UI Claude adapter
+
+    The backend wraps the official `ClaudeAgentAdapter`, exposes backend
+    tools through the Claude Agent SDK MCP server, and streams AG-UI events
+    back to CopilotKit.
+
+    <DemoCode file="src/claude-agent-sdk-adapter.ts" region="claude-agent-sdk-agent-setup" />
+
+  </Step>
+</Steps>

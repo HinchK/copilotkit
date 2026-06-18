@@ -1,0 +1,163 @@
+---
+title: Quickstart
+description: Connect a Claude Agent SDK Python backend to CopilotKit in minutes.
+icon: "lucide/Play"
+hideTOC: true
+---
+
+import { Tabs, Tab } from "fumadocs-ui/components/tabs";
+
+## Prerequisites
+
+Before you begin, you'll need the following:
+
+- An Anthropic API key
+- Node.js 20+
+- Python 3.11+
+- Your favorite package manager
+
+## Getting started
+
+<Steps>
+  <Step>
+    ### Create a free account
+
+    <SignupLink surface="docs_claude_sdk_python_quickstart_step1">Sign up for a free developer account</SignupLink> on our Enterprise Intelligence Platform to get a license key. You'll use it later to enable persistent threads, observability, and the inspector.
+  </Step>
+
+  <Step>
+    ### Create the starter
+
+    Start from the Claude Agent SDK Python starter:
+
+    ```bash
+    npx copilotkit@latest init --framework claude-sdk-python
+    ```
+
+    The starter includes a Next.js frontend, a Copilot Runtime route, and a
+    FastAPI AG-UI agent server backed by the official Claude Agent SDK adapter.
+  </Step>
+
+  <Step>
+    ### Install dependencies
+
+    ```bash
+    npm install
+    ```
+
+    If your generated project keeps Python dependencies separate, install the
+    backend requirements from the agent directory as well:
+
+    ```bash
+    pip install claude-agent-sdk ag-ui-claude-sdk ag-ui-protocol anthropic fastapi uvicorn python-dotenv
+    ```
+  </Step>
+
+  <Step>
+    ### Configure your environment
+
+    Create a `.env` file and add your Anthropic API key:
+
+    ```plaintext title=".env"
+    ANTHROPIC_API_KEY=your_anthropic_api_key
+    ANTHROPIC_MODEL=claude-sonnet-4.6
+    ```
+  </Step>
+
+  <Step>
+    ### Start the development server
+
+    <Tabs groupId="package-manager" items={['npm', 'pnpm', 'yarn', 'bun']}>
+      <Tab value="npm">
+        ```bash
+        npm run dev
+        ```
+      </Tab>
+      <Tab value="pnpm">
+        ```bash
+        pnpm dev
+        ```
+      </Tab>
+      <Tab value="yarn">
+        ```bash
+        yarn dev
+        ```
+      </Tab>
+      <Tab value="bun">
+        ```bash
+        bun dev
+        ```
+      </Tab>
+    </Tabs>
+
+    This starts both the Next.js app and the Python agent server.
+  </Step>
+
+  <Step>
+    ### Add Claude Agent SDK wiring to an existing app
+
+    If you already have a Python agent backend, keep CopilotKit's frontend
+    wiring the same and expose the agent through the official AG-UI Claude
+    adapter.
+
+    <FrameworkSetup concept="agent-setup" />
+
+    Point your Copilot Runtime at that AG-UI endpoint with an `HttpAgent`:
+
+    ```ts title="app/api/copilotkit/route.ts"
+    import {
+      CopilotRuntime,
+      ExperimentalEmptyAdapter,
+      copilotRuntimeNextJSAppRouterEndpoint,
+    } from "@copilotkit/runtime";
+    import { HttpAgent } from "@ag-ui/client";
+    import { NextRequest } from "next/server";
+
+    const runtime = new CopilotRuntime({
+      agents: {
+        default: new HttpAgent({
+          url: process.env.AGENT_URL ?? "http://localhost:8000",
+        }),
+      },
+    });
+
+    export const POST = async (req: NextRequest) => {
+      const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
+        runtime,
+        serviceAdapter: new ExperimentalEmptyAdapter(),
+        endpoint: "/api/copilotkit",
+      });
+
+      return handleRequest(req);
+    };
+    ```
+  </Step>
+
+  <Step>
+    ### Render the chat UI
+
+    Wrap your app with `CopilotKit` and render a prebuilt chat component:
+
+    ```tsx title="app/page.tsx"
+    "use client";
+
+    import { CopilotKit, CopilotSidebar } from "@copilotkit/react-core/v2";
+    import "@copilotkit/react-core/v2/styles.css";
+
+    export default function Page() {
+      return (
+        <CopilotKit runtimeUrl="/api/copilotkit">
+          <main>
+            <h1>Your app</h1>
+            <CopilotSidebar />
+          </main>
+        </CopilotKit>
+      );
+    }
+    ```
+  </Step>
+</Steps>
+
+## What's next?
+
+Once the basic chat is running, add frontend tools, shared state, human-in-the-loop controls, or A2UI surfaces from the sidebar examples.

@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    npm install @ag-ui/claude-agent-sdk @ag-ui/core @ag-ui/encoder @anthropic-ai/claude-agent-sdk @anthropic-ai/sdk
+    ```
+
+  </Step>
+  <Step>
+    ### Inject read-only context into the system prompt
+
+    Values published with `useAgentContext` arrive in `input.context`. The
+    Claude backend formats them into the system prompt on each run so the
+    model can use the latest read-only UI context.
+
+    <DemoCode file="src/agent_server.ts" region="agent-context-setup" />
+
+  </Step>
+</Steps>

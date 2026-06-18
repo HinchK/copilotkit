@@ -23,6 +23,7 @@ const declarativeGenUiAgent = new HttpAgent({
   url: `${AGENT_URL}/declarative-gen-ui`,
 });
 
+// @region[a2ui-runtime-setup]
 const runtime = new CopilotRuntime({
   // @ts-ignore -- see main route.ts
   agents: { "declarative-gen-ui": declarativeGenUiAgent },
@@ -41,6 +42,7 @@ const runtime = new CopilotRuntime({
     defaultCatalogId: "declarative-gen-ui-catalog",
   },
 });
+// @endregion[a2ui-runtime-setup]
 
 export const POST = async (req: NextRequest) => {
   try {

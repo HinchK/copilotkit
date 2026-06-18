@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    npm install @ag-ui/claude-agent-sdk @ag-ui/core @ag-ui/encoder @anthropic-ai/claude-agent-sdk @anthropic-ai/sdk
+    ```
+
+  </Step>
+  <Step>
+    ### Build the system prompt from forwarded props
+
+    The agent-config demo reads the provider's `properties` from
+    `forwardedProps`, validates the values, and composes a Claude system
+    prompt for the current turn.
+
+    <DemoCode file="src/agent/agent-config-prompt.ts" region="agent-config-setup" />
+
+  </Step>
+</Steps>

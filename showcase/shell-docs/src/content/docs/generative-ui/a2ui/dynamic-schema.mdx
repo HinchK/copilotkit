@@ -16,14 +16,19 @@ any request without pre-defined schemas.
 
 <FrameworkSetup concept="agent-setup" />
 
-1. The agent calls the A2UI tool to draw a surface — made available
-   when `injectA2UITool: true`.
+1. The agent calls an A2UI generation tool to draw a surface. Some
+   integrations let the Copilot Runtime inject that tool; others own the
+   tool in the backend and use the runtime only for catalog context and
+   rendering.
 2. The runtime serializes your client-side catalog (component names +
    Zod prop schemas) into the agent's `copilotkit.context` so the LLM
    knows which components it may emit.
-3. The tool call streams through LangGraph as `TOOL_CALL_ARGS` events.
-4. The A2UI middleware intercepts the stream and renders cards
-   progressively as data items arrive.
+3. The agent returns A2UI operations (`createSurface`, `updateComponents`,
+   and `updateDataModel`) through the AG-UI event stream.
+4. The A2UI middleware detects those operations and renders the surface in
+   the chat.
+
+<FrameworkSetup concept="a2ui-dynamic-setup" />
 
 ## The 3-file split
 
@@ -81,10 +86,10 @@ activity-message renderer:
 <Step>
 ### Turn A2UI on (runtime)
 
-On the TypeScript runtime, `injectA2UITool: true` turns A2UI on:
-CopilotKit renders A2UI output, serialises your client catalog into
-the agent's `copilotkit.context`, and makes the A2UI tool available to
-the agent. The frontend wiring is identical across integrations:
+On the TypeScript runtime, configure `a2ui` so CopilotKit renders A2UI
+output and serializes your client catalog into the agent's
+`copilotkit.context`. If the runtime should provide the A2UI tool, set
+`injectA2UITool: true`:
 
 ```typescript title="app/api/copilotkit/route.ts"
 const runtime = new CopilotRuntime({
@@ -94,22 +99,25 @@ const runtime = new CopilotRuntime({
   },
 });
 ```
+
+If your backend already exposes its own A2UI tool, keep `a2ui` configured
+but set `injectA2UITool: false`. The runtime still renders returned
+`a2ui_operations`; it just does not add a duplicate tool.
 </Step>
 </Steps>
 
 ## Progressive streaming
 
-The secondary LLM's `render_a2ui` tool call streams through LangGraph
-as `TOOL_CALL_ARGS` events. The A2UI middleware:
+When the integration streams a secondary `render_a2ui` tool call, the A2UI
+middleware can render progressively:
 
 1. Waits for the full `components` array before emitting anything —
    the schema must be complete before rendering starts.
 2. Extracts `surfaceId` + `root` from the partial JSON.
 3. Emits `createSurface` + `updateComponents` once the schema is
    complete.
-4. Extracts complete `items` objects progressively and emits an
-   `updateDataModel` for each, so cards appear one by one as data
-   streams in.
+4. Extracts complete data objects progressively and emits
+   `updateDataModel` operations, so cards can appear as data streams in.
 
 A built-in progress indicator shows while the schema is still
 generating and hides automatically once data items start arriving.

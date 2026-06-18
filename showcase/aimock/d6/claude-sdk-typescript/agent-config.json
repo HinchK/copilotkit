@@ -6,23 +6,23 @@
   },
   "fixtures": [
     {
-      "_comment": "agent-config tone:professional pill — value-A. Must differ from the tone:casual response below so the knob-diff assertion passes.",
+      "_comment": "agent-config responseLength:concise pill — value-A. Must be shorter than the responseLength:detailed response by >= 80 chars.",
       "match": {
-        "userMessage": "tone:professional",
+        "userMessage": "responseLength:concise",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "content": "Good day. I am your AI assistant, configured to communicate in a professional tone. I am ready to assist you with any inquiries or tasks you may have. Please let me know how I can be of service."
+        "content": "Agent context lets the frontend pass runtime config (tone, expertise, response length) to the agent on every turn via useAgentContext."
       }
     },
     {
-      "_comment": "agent-config tone:casual pill — value-B. Must differ from the tone:professional response.",
+      "_comment": "agent-config responseLength:detailed pill — value-B. Must exceed the concise response by >= 80 chars.",
       "match": {
-        "userMessage": "tone:casual",
+        "userMessage": "responseLength:detailed",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "content": "Hey there! I'm your AI buddy, keeping things chill and casual. What's up? Ask me anything — happy to help out however I can!"
+        "content": "Agent context is a CopilotKit mechanism that lets the frontend pass runtime configuration — such as preferred tone, expertise level, and response length — to the agent on every turn via the useAgentContext hook. When the user changes a setting in the UI (for example, flipping the tone selector from 'professional' to 'casual'), the new value is included in the next request's forwarded properties. The agent's system-prompt builder reads these properties and adjusts its behavior accordingly, producing responses that reflect the user's current preferences without requiring a page reload or a new conversation thread. This makes the agent feel responsive to real-time user intent while keeping the configuration surface entirely on the frontend."
       }
     },
     {
@@ -46,23 +46,23 @@
       }
     },
     {
-      "_comment": "agent-config responseLength:concise pill — value-A. Must be shorter than the responseLength:detailed response by >= 80 chars.",
+      "_comment": "agent-config tone:professional pill — value-A. Must differ from the tone:casual response below so the knob-diff assertion passes.",
       "match": {
-        "userMessage": "responseLength:concise",
+        "userMessage": "tone:professional",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "content": "Agent context lets the frontend pass runtime config (tone, expertise, response length) to the agent on every turn via useAgentContext."
+        "content": "Good day. I am your AI assistant, configured to communicate in a professional tone. I am ready to assist you with any inquiries or tasks you may have. Please let me know how I can be of service."
       }
     },
     {
-      "_comment": "agent-config responseLength:detailed pill — value-B. Must exceed the concise response by >= 80 chars.",
+      "_comment": "agent-config tone:casual pill — value-B. Must differ from the tone:professional response.",
       "match": {
-        "userMessage": "responseLength:detailed",
+        "userMessage": "tone:casual",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "content": "Agent context is a CopilotKit mechanism that lets the frontend pass runtime configuration — such as preferred tone, expertise level, and response length — to the agent on every turn via the useAgentContext hook. When the user changes a setting in the UI (for example, flipping the tone selector from 'professional' to 'casual'), the new value is included in the next request's forwarded properties. The agent's system-prompt builder reads these properties and adjusts its behavior accordingly, producing responses that reflect the user's current preferences without requiring a page reload or a new conversation thread. This makes the agent feel responsive to real-time user intent while keeping the configuration surface entirely on the frontend."
+        "content": "Hey there! I'm your AI buddy, keeping things chill and casual. What's up? Ask me anything — happy to help out however I can!"
       }
     }
   ]

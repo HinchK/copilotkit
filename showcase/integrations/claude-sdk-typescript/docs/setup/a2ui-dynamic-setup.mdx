@@ -1,0 +1,23 @@
+<Steps>
+  <Step>
+    ### Keep A2UI rendering enabled without injecting a duplicate tool
+
+    The Claude Agent SDK demo owns the `generate_a2ui` tool in the backend.
+    Keep the runtime A2UI middleware enabled so it can pass the registered
+    catalog through context and render returned `a2ui_operations`, but set
+    `injectA2UITool: false` so the runtime does not add a second tool.
+
+    <DemoCode file="src/app/api/copilotkit-declarative-gen-ui/route.ts" region="a2ui-runtime-setup" />
+
+  </Step>
+  <Step>
+    ### Generate the A2UI surface from Claude
+
+    The backend tool makes a secondary Claude request forced to call
+    `render_a2ui`, converts those arguments into A2UI operations, and returns
+    them as the tool result that CopilotKit renders.
+
+    <DemoCode file="src/agent_server.ts" region="a2ui-backend-tool" />
+
+  </Step>
+</Steps>

@@ -15,11 +15,7 @@
 // surface (the whole point of the demo).
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  CopilotKit,
-  CopilotChat,
-  type CopilotKitCoreErrorCode,
-} from "@copilotkit/react-core/v2";
+import { CopilotKit, CopilotChat } from "@copilotkit/react-core/v2";
 import { AuthBanner } from "./auth-banner";
 import { SignInCard } from "./sign-in-card";
 import { useDemoAuth } from "./use-demo-auth";
@@ -27,7 +23,7 @@ import { DEMO_TOKEN } from "./demo-token";
 
 interface AuthDemoErrorState {
   message: string;
-  code: CopilotKitCoreErrorCode | string;
+  code: string;
 }
 
 export default function AuthDemoPage() {
@@ -39,8 +35,9 @@ export default function AuthDemoPage() {
     signOut,
   } = useDemoAuth();
 
-  const headers = useMemo<Record<string, string>>(
-    () => (authorizationHeader ? { Authorization: authorizationHeader } : {}),
+  const headers = useMemo(
+    (): Record<string, string> =>
+      authorizationHeader ? { Authorization: authorizationHeader } : {},
     [authorizationHeader],
   );
 
@@ -73,7 +70,11 @@ export default function AuthDemoPage() {
       onError={(event) => {
         setAuthError({
           message: event.error?.message ?? String(event.error),
-          code: event.code,
+          code:
+            event.error?.code ??
+            event.error?.extensions?.code ??
+            event.context.response?.status?.toString() ??
+            "UNKNOWN",
         });
       }}
     >

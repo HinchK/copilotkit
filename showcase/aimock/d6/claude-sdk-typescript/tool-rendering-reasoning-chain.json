@@ -9,47 +9,47 @@
   },
   "fixtures": [
     {
-      "_comment": "tool-rendering-reasoning-chain pill 1 (stocks) — final narration after the MSFT tool result lands. Specific toolCallId so this matches BEFORE the first-leg fixture below despite the same userMessage substring. Source: showcase/harness/fixtures/d5/tool-rendering-reasoning-chain.json.",
+      "_comment": "tool-rendering-reasoning-chain pill 3 (flights + destination weather) — final narration after get_weather(JFK) lands. userMessage is the LANGGRAPH-PYTHON-UNIQUE tail 'show me the weather there'; the basic tool-rendering demos AND every other integration's reasoning-chain demo still send 'Find flights from SFO to JFK.' (no destination-weather request) which lacks this substring, so this fixture stays scoped to this demo without affecting fleet-wide aimock traffic.",
       "match": {
-        "toolCallId": "call_rc_stock_msft_001",
+        "toolCallId": "call_rc_weather_jfk_001",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "content": "AAPL is at $338.37 (-2.96% on the day) while MSFT is at $412.18 (+1.08%). MSFT is outpacing AAPL by roughly 4 points today — strong day for MSFT, rough one for AAPL."
+        "content": "Three flights from SFO to JFK — United UA231 at 08:15 ($348), Delta DL412 at 11:20 ($312), and JetBlue B6722 at 17:05 ($289). JFK is currently 68°F and sunny — easy travel weather on the receiving end."
       }
     },
     {
-      "_comment": "tool-rendering-reasoning-chain pill 1 (stocks) — second leg: after get_stock_price(AAPL) returns, chain to MSFT for the comparison.",
+      "_comment": "tool-rendering-reasoning-chain pill 3 (flights + destination weather) — second leg: after search_flights(SFO,JFK) returns, chain to destination weather.",
       "match": {
-        "toolCallId": "call_rc_stock_aapl_001",
+        "toolCallId": "call_rc_flights_jfk_001",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "reasoning": "AAPL quote is in hand. The user explicitly asked to compare AAPL with MSFT, so I'll fetch MSFT next and then summarize the side-by-side.",
-        "content": "Now pulling MSFT to complete the comparison.",
+        "reasoning": "Flights are in hand. The user explicitly asked for the destination weather as part of the request, so pulling JFK weather next to round out the trip plan.",
+        "content": "Pulling JFK weather to round out the trip plan.",
         "toolCalls": [
           {
-            "id": "call_rc_stock_msft_001",
-            "name": "get_stock_price",
-            "arguments": "{\"ticker\":\"MSFT\",\"price_usd\":412.18,\"change_pct\":1.08}"
+            "id": "call_rc_weather_jfk_001",
+            "name": "get_weather",
+            "arguments": "{\"location\":\"JFK\"}"
           }
         ]
       }
     },
     {
-      "_comment": "tool-rendering-reasoning-chain pill 1 (stocks) — first leg: emit get_stock_price(AAPL). The `Compare AAPL and MSFT stocks` substring is unique to this demo's pill prompt — other integrations' reasoning-chain demos still send the older `How is AAPL doing?` prompt — so we don't need a tool-name gate and the fixture stays scoped to langgraph-python without affecting fleet-wide aimock traffic. MUST appear before the bare 'AAPL' fixtures later in this file.",
+      "_comment": "tool-rendering-reasoning-chain pill 3 (flights + destination weather) — first leg: emit search_flights(SFO,JFK). The 'show me the weather there' substring is unique to this demo's pill, so the basic tool-rendering demo's bare 'Find flights from SFO to JFK.' prompt (and the equivalent prompts in other integrations' reasoning-chain demos that have not yet been ported to the chained phrasing) flow through to the basic single-tool flights fixture later in the file.",
       "match": {
-        "userMessage": "Compare AAPL and MSFT stocks",
+        "userMessage": "show me the weather there",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "reasoning": "The user asked to compare AAPL and MSFT. I'll fetch AAPL first, then MSFT, then summarize the deltas in a single sentence so the comparison is the punchline.",
-        "content": "Pulling the AAPL quote first.",
+        "reasoning": "The user wants flights from SFO to JFK AND the destination weather. I'll call search_flights first, then chain get_weather on JFK so they have flight options and arrival conditions in one reply.",
+        "content": "Searching SFO→JFK flights.",
         "toolCalls": [
           {
-            "id": "call_rc_stock_aapl_001",
-            "name": "get_stock_price",
-            "arguments": "{\"ticker\":\"AAPL\",\"price_usd\":338.37,\"change_pct\":-2.96}"
+            "id": "call_rc_flights_jfk_001",
+            "name": "search_flights",
+            "arguments": "{\"origin\":\"SFO\",\"destination\":\"JFK\"}"
           }
         ]
       }
@@ -101,47 +101,47 @@
       }
     },
     {
-      "_comment": "tool-rendering-reasoning-chain pill 3 (flights + destination weather) — final narration after get_weather(JFK) lands. userMessage is the LANGGRAPH-PYTHON-UNIQUE tail 'show me the weather there'; the basic tool-rendering demos AND every other integration's reasoning-chain demo still send 'Find flights from SFO to JFK.' (no destination-weather request) which lacks this substring, so this fixture stays scoped to this demo without affecting fleet-wide aimock traffic.",
+      "_comment": "tool-rendering-reasoning-chain pill 1 (stocks) — final narration after the MSFT tool result lands. Specific toolCallId so this matches BEFORE the first-leg fixture below despite the same userMessage substring. Source: showcase/harness/fixtures/d5/tool-rendering-reasoning-chain.json.",
       "match": {
-        "toolCallId": "call_rc_weather_jfk_001",
+        "toolCallId": "call_rc_stock_msft_001",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "content": "Three flights from SFO to JFK — United UA231 at 08:15 ($348), Delta DL412 at 11:20 ($312), and JetBlue B6722 at 17:05 ($289). JFK is currently 68°F and sunny — easy travel weather on the receiving end."
+        "content": "AAPL is at $338.37 (-2.96% on the day) while MSFT is at $412.18 (+1.08%). MSFT is outpacing AAPL by roughly 4 points today — strong day for MSFT, rough one for AAPL."
       }
     },
     {
-      "_comment": "tool-rendering-reasoning-chain pill 3 (flights + destination weather) — second leg: after search_flights(SFO,JFK) returns, chain to destination weather.",
+      "_comment": "tool-rendering-reasoning-chain pill 1 (stocks) — second leg: after get_stock_price(AAPL) returns, chain to MSFT for the comparison.",
       "match": {
-        "toolCallId": "call_rc_flights_jfk_001",
+        "toolCallId": "call_rc_stock_aapl_001",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "reasoning": "Flights are in hand. The user explicitly asked for the destination weather as part of the request, so pulling JFK weather next to round out the trip plan.",
-        "content": "Pulling JFK weather to round out the trip plan.",
+        "reasoning": "AAPL quote is in hand. The user explicitly asked to compare AAPL with MSFT, so I'll fetch MSFT next and then summarize the side-by-side.",
+        "content": "Now pulling MSFT to complete the comparison.",
         "toolCalls": [
           {
-            "id": "call_rc_weather_jfk_001",
-            "name": "get_weather",
-            "arguments": "{\"location\":\"JFK\"}"
+            "id": "call_rc_stock_msft_001",
+            "name": "get_stock_price",
+            "arguments": "{\"ticker\":\"MSFT\",\"price_usd\":412.18,\"change_pct\":1.08}"
           }
         ]
       }
     },
     {
-      "_comment": "tool-rendering-reasoning-chain pill 3 (flights + destination weather) — first leg: emit search_flights(SFO,JFK). The 'show me the weather there' substring is unique to this demo's pill, so the basic tool-rendering demo's bare 'Find flights from SFO to JFK.' prompt (and the equivalent prompts in other integrations' reasoning-chain demos that have not yet been ported to the chained phrasing) flow through to the basic single-tool flights fixture later in the file.",
+      "_comment": "tool-rendering-reasoning-chain pill 1 (stocks) — first leg: emit get_stock_price(AAPL). The `Compare AAPL and MSFT stocks` substring is unique to this demo's pill prompt — other integrations' reasoning-chain demos still send the older `How is AAPL doing?` prompt — so we don't need a tool-name gate and the fixture stays scoped to langgraph-python without affecting fleet-wide aimock traffic. MUST appear before the bare 'AAPL' fixtures later in this file.",
       "match": {
-        "userMessage": "show me the weather there",
+        "userMessage": "Compare AAPL and MSFT stocks",
         "context": "claude-sdk-typescript"
       },
       "response": {
-        "reasoning": "The user wants flights from SFO to JFK AND the destination weather. I'll call search_flights first, then chain get_weather on JFK so they have flight options and arrival conditions in one reply.",
-        "content": "Searching SFO→JFK flights.",
+        "reasoning": "The user asked to compare AAPL and MSFT. I'll fetch AAPL first, then MSFT, then summarize the deltas in a single sentence so the comparison is the punchline.",
+        "content": "Pulling the AAPL quote first.",
         "toolCalls": [
           {
-            "id": "call_rc_flights_jfk_001",
-            "name": "search_flights",
-            "arguments": "{\"origin\":\"SFO\",\"destination\":\"JFK\"}"
+            "id": "call_rc_stock_aapl_001",
+            "name": "get_stock_price",
+            "arguments": "{\"ticker\":\"AAPL\",\"price_usd\":338.37,\"change_pct\":-2.96}"
           }
         ]
       }

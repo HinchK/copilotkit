@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    pip install claude-agent-sdk ag-ui-claude-sdk ag-ui-protocol anthropic
+    ```
+
+  </Step>
+  <Step>
+    ### Use the same AG-UI agent for headless runs
+
+    Programmatic APIs such as `agent.subscribe`, `agent.addMessage`, and
+    `agent.runAgent` drive the same AG-UI run loop as the prebuilt chat UI.
+    Keep the backend wiring on the official Claude adapter.
+
+    <DemoCode file="src/agents/claude_agent_sdk_adapter.py" region="claude-agent-sdk-agent-setup" />
+
+  </Step>
+</Steps>

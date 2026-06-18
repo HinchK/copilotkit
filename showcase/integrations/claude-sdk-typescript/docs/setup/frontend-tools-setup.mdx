@@ -1,0 +1,21 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    npm install @ag-ui/claude-agent-sdk @ag-ui/core @ag-ui/encoder @anthropic-ai/claude-agent-sdk @anthropic-ai/sdk
+    ```
+
+  </Step>
+  <Step>
+    ### Forward frontend tools into Claude
+
+    CopilotKit sends tools registered with `useFrontendTool`,
+    `useRenderToolCall`, and `useHumanInTheLoop` on every AG-UI run. The
+    Claude backend converts those definitions into Anthropic tool schemas so
+    Claude can call them and CopilotKit can route the calls back to the UI.
+
+    <DemoCode file="src/agent_server.ts" region="frontend-tools-setup" />
+
+  </Step>
+</Steps>

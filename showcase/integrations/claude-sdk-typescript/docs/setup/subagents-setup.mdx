@@ -1,0 +1,21 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    npm install @ag-ui/claude-agent-sdk @ag-ui/core @ag-ui/encoder @anthropic-ai/claude-agent-sdk @anthropic-ai/sdk
+    ```
+
+  </Step>
+  <Step>
+    ### Expose sub-agents as supervisor tools
+
+    The supervisor defines each sub-agent as a tool. When Claude calls one,
+    the backend makes a focused secondary Claude request, records the
+    delegation in shared state, and returns the sub-agent output to the
+    supervisor.
+
+    <DemoCode file="src/agent/subagents-prompts.ts" region="supervisor-delegation-tools" />
+
+  </Step>
+</Steps>

@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import {
   CopilotRuntime,
   ExperimentalEmptyAdapter,
   copilotRuntimeNextJSAppRouterEndpoint,
 } from "@copilotkit/runtime";
-import { AbstractAgent, HttpAgent } from "@ag-ui/client";
+import type { AbstractAgent } from "@ag-ui/client";
+import { HttpAgent } from "@ag-ui/client";
 
 // The Claude agent backend runs as a separate TypeScript process on port 8000.
 // This runtime proxies CopilotKit requests to it via AG-UI protocol.
@@ -44,7 +46,7 @@ const agentNames = [
   "gen-ui-agent", // overridden -> /gen-ui-agent (NOT pass-through)
   "shared-state-read",
   "shared-state-write",
-  "shared-state-streaming",
+  "shared-state-streaming", // overridden -> /shared-state-streaming
   "subagents", // overridden -> /subagents (NOT pass-through)
   "shared-state-read-write", // overridden -> /shared-state-read-write (NOT pass-through)
   "headless-complete", // overridden -> /headless-complete (NOT pass-through)
@@ -55,6 +57,7 @@ const agentNames = [
   "chat-customization-css",
   "headless-simple",
   "frontend_tools",
+  "threadid-frontend-tool-roundtrip",
   "frontend-tools-async",
   "hitl-in-chat",
   "hitl-in-chat-booking",
@@ -88,9 +91,7 @@ const agentNames = [
   "tool-rendering-default-catchall", // overridden -> /tool-rendering
   "tool-rendering-custom-catchall", // overridden -> /tool-rendering
   "tool-rendering-reasoning-chain", // overridden -> /tool-rendering-reasoning-chain
-  // Reasoning variants — both share the same pass-through agent; differ
-  // only in whether the frontend overrides the `messageView.reasoningMessage`
-  // slot. Mirrors the canonical LGP topology.
+  // Reasoning variants — overridden -> /reasoning (NOT pass-through).
   "reasoning-default",
   "reasoning-custom",
 ];
@@ -150,6 +151,10 @@ agents["shared-state-read-write"] = new HttpAgent({
   url: `${AGENT_URL}/shared-state-read-write`,
 });
 
+agents["shared-state-streaming"] = new HttpAgent({
+  url: `${AGENT_URL}/shared-state-streaming`,
+});
+
 // Headless Chat (Complete) is NOT pass-through: the backend owns
 // `get_weather` and `get_stock_price` (see `src/agent_server.ts`
 // `/headless-complete`). The demo page targets
@@ -159,6 +164,15 @@ agents["shared-state-read-write"] = new HttpAgent({
 // convention for dedicated-runtime demos).
 agents["headless-complete"] = new HttpAgent({
   url: `${AGENT_URL}/headless-complete`,
+});
+
+// Reasoning variants share the same backend endpoint; the frontend decides
+// whether to render the default or custom reasoning slot.
+agents["reasoning-default"] = new HttpAgent({
+  url: `${AGENT_URL}/reasoning`,
+});
+agents["reasoning-custom"] = new HttpAgent({
+  url: `${AGENT_URL}/reasoning`,
 });
 
 console.log(

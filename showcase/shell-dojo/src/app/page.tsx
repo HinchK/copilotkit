@@ -7,6 +7,7 @@ import {
   getFeature,
 } from "@/lib/registry";
 import type { Integration, Demo, FeatureCategory } from "@/lib/registry";
+import { resolveBackendUrl } from "@/lib/backend-url";
 import { CodeBlock } from "@/components/code-block";
 import demoContentData from "@/data/demo-content.json";
 
@@ -286,7 +287,7 @@ export default function DojoPage() {
 
   const previewUrl =
     integration && selectedDemo
-      ? `${integration.backend_url}${selectedDemo.route}`
+      ? `${resolveBackendUrl(integration.slug, integration.backend_url)}${selectedDemo.route}`
       : null;
 
   return (

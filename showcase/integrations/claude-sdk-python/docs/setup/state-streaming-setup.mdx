@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    pip install claude-agent-sdk ag-ui-claude-sdk ag-ui-protocol anthropic
+    ```
+
+  </Step>
+  <Step>
+    ### Stream document state from backend tool args
+
+    The Claude demo exposes a `write_document` backend tool. When Claude calls
+    it, the backend copies the streamed `document` argument into shared state
+    and emits `STATE_SNAPSHOT` updates as the JSON argument grows.
+
+    <DemoCode file="src/agents/agent.py" region="state-streaming-middleware" />
+
+  </Step>
+</Steps>

@@ -96,6 +96,12 @@ vi.mock("./targets.js", async () => {
     ...actual,
     demosForSlug: (slug: string, _config: LocalConfig) =>
       demosForSlugMock(slug),
+    loadManifest: (slug: string, _config: LocalConfig) => ({
+      slug,
+      name: slug,
+      demos: [],
+      not_supported_features: ["interrupt-headless"],
+    }),
   };
 });
 
@@ -166,12 +172,18 @@ describe("buildLocalServicesJson", () => {
     const scopes: SlugScope[] = [{ slug: "langgraph-python" }];
     const out = JSON.parse(
       buildLocalServicesJson(scopes, "d5", STUB_CONFIG),
-    ) as Array<{ name: string; publicUrl: string; demos: string[] }>;
+    ) as Array<{
+      name: string;
+      publicUrl: string;
+      demos: string[];
+      notSupportedFeatures: string[];
+    }>;
     expect(out).toEqual([
       {
         name: "showcase-langgraph-python",
         publicUrl: "http://langgraph-python:10000",
         demos: ["agentic-chat"],
+        notSupportedFeatures: ["interrupt-headless"],
       },
     ]);
   });

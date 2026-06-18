@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    npm install @ag-ui/claude-agent-sdk @ag-ui/core @ag-ui/encoder @anthropic-ai/claude-agent-sdk @anthropic-ai/sdk
+    ```
+
+  </Step>
+  <Step>
+    ### Read and write AG-UI shared state
+
+    The UI writes preferences into `input.state`. The Claude backend reads
+    those preferences into the system prompt and writes notes back by
+    emitting `STATE_SNAPSHOT` events after the `set_notes` tool runs.
+
+    <DemoCode file="src/agent/shared-state-read-write-prompt.ts" region="shared-state-setup" />
+
+  </Step>
+</Steps>

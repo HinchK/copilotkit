@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    npm install @ag-ui/claude-agent-sdk @ag-ui/core @ag-ui/encoder @anthropic-ai/claude-agent-sdk @anthropic-ai/sdk
+    ```
+
+  </Step>
+  <Step>
+    ### Treat HITL controls as frontend tools
+
+    `useHumanInTheLoop` registers a frontend-owned tool. The Claude backend
+    forwards that tool schema to Claude, and CopilotKit resolves the call on
+    the frontend when the user approves, rejects, or supplies more input.
+
+    <DemoCode file="src/agent_server.ts" region="frontend-tools-setup" />
+
+  </Step>
+</Steps>

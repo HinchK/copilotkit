@@ -42,19 +42,22 @@ CopilotKit ships two complementary ways to pause an agent turn and ask
 the human something. They look similar from the outside (the chat
 pauses, a custom component appears, the user answers, the run resumes)
 but they're wired differently on the backend, and each has its own niche.
+Not every agent framework supports both patterns; unsupported interrupt
+demos are marked as such in the showcase dashboard.
 
 | Pattern | Who decides to pause? | Backend surface |
 | --- | --- | --- |
-| `useHumanInTheLoop` | The **LLM**, by calling a registered client-side tool | A frontend-only tool description (Zod schema + `render`) |
-| `useInterrupt` | The **graph**, by calling `interrupt(...)` during a node | A server-side `interrupt()` call in your LangGraph agent |
+| `useHumanInTheLoop` | The **LLM**, by calling a registered client-side tool | A frontend-owned AG-UI tool description (Zod schema + `render`) |
+| `useInterrupt` | The **backend workflow**, by reaching a deterministic checkpoint | A framework/runtime-specific interrupt and resume primitive, when the integration supports one |
 
 **Pick `useHumanInTheLoop`** when the pause is an _agent-initiated_
 decision — the model chose to ask the user — and you want the picker UI
 inlined into the normal tool-call flow.
 
-**Pick `useInterrupt`** when the pause is a _graph-enforced_ checkpoint —
-the code path deterministically requires a human answer — and you want
-`langgraph.interrupt()` as the server-side contract.
+**Pick `useInterrupt`** when the pause is a _backend-enforced_
+checkpoint — the code path deterministically requires a human answer —
+and your selected integration exposes a server-side interrupt/resume
+contract.
 
 ## Pattern 1 — `useHumanInTheLoop` (tool-based)
 
@@ -72,26 +75,29 @@ calendar API, or anything else:
 
 <Snippet region="time-slots" title="frontend/src/app/page.tsx — candidate slots" />
 
-## Pattern 2 — `useInterrupt` (graph-paused)
+## Pattern 2 — `useInterrupt` (backend-paused)
 
-With LangGraph's `interrupt()` the pause is enforced by the graph
-itself: a node calls `interrupt({...})`, the run suspends, the client
-receives the payload, renders a UI, and resumes the run with the user's
-answer. CopilotKit's `useInterrupt` hook is the render contract.
+With a backend-paused interrupt, the pause is enforced by your agent
+runtime itself: the backend reaches a checkpoint, the run suspends, the
+client receives the payload, renders a UI, and resumes the run with the
+user's answer. CopilotKit's `useInterrupt` hook is the render contract.
+The backend primitive is integration-specific, and some integrations may
+not support this pattern yet.
 
 See the [`useInterrupt` deep dive](/human-in-the-loop/useInterrupt) for
-the full walkthrough, including the backend tool and render-prop wiring.
+the full walkthrough of a backend interrupt contract and render-prop
+wiring.
 
 <InlineDemo demo="gen-ui-interrupt" />
 
 ## Going headless
 
-Both patterns above ship with a `render` prop — CopilotKit handles the
-"when to show the picker" logic for you. If you want to drive
-interrupt resolution from a custom UI that lives anywhere in the tree
-(not necessarily inside a chat), see the
-[headless interrupts guide](/human-in-the-loop/headless) — it shows
-how to compose `useAgent`, `agent.subscribe`, and `copilotkit.runAgent`
-to build your own `useInterrupt` equivalent.
+Both patterns above ship with a `render` prop when supported —
+CopilotKit handles the "when to show the picker" logic for you. If your
+integration supports interrupts and you want to drive resolution from a
+custom UI that lives anywhere in the tree (not necessarily inside a
+chat), see the [headless interrupts guide](/human-in-the-loop/headless)
+for the `useAgent`, `agent.subscribe`, and `copilotkit.runAgent`
+composition.
 
 <IntegrationGrid path="human-in-the-loop" />

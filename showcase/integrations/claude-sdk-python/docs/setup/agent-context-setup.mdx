@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    pip install claude-agent-sdk ag-ui-claude-sdk ag-ui-protocol anthropic
+    ```
+
+  </Step>
+  <Step>
+    ### Inject read-only context into the system prompt
+
+    Values published with `useAgentContext` arrive in `input_data.context`.
+    The Claude backend formats them into the system prompt on each run so the
+    model can use the latest read-only UI context.
+
+    <DemoCode file="src/agents/agent.py" region="agent-context-setup" />
+
+  </Step>
+</Steps>

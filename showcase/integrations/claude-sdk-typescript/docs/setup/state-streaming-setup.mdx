@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    npm install @ag-ui/claude-agent-sdk @ag-ui/core @ag-ui/encoder @anthropic-ai/claude-agent-sdk @anthropic-ai/sdk
+    ```
+
+  </Step>
+  <Step>
+    ### Stream document state from backend tool args
+
+    The Claude demo exposes a `write_document` backend tool. When Claude calls
+    it, the backend copies the streamed `document` argument into shared state
+    and emits `STATE_SNAPSHOT` updates as the JSON argument grows.
+
+    <DemoCode file="src/agent_server.ts" region="state-streaming-middleware" />
+
+  </Step>
+</Steps>

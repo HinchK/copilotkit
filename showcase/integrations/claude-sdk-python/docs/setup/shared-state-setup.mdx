@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    pip install claude-agent-sdk ag-ui-claude-sdk ag-ui-protocol anthropic
+    ```
+
+  </Step>
+  <Step>
+    ### Read and write AG-UI shared state
+
+    The UI writes preferences into `input_data.state`. The Claude backend
+    reads those preferences into the system prompt and writes notes back by
+    emitting `STATE_SNAPSHOT` events after the `set_notes` tool runs.
+
+    <DemoCode file="src/agents/shared_state_read_write_agent.py" region="shared-state-setup" />
+
+  </Step>
+</Steps>

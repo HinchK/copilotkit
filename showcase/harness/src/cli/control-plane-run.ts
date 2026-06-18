@@ -49,7 +49,7 @@ import type { Logger } from "../types/index.js";
 import type { LocalConfig } from "./config.js";
 import type { TestTarget } from "./targets.js";
 import type { TerminalResult } from "./results.js";
-import { demosForSlug } from "./targets.js";
+import { demosForSlug, loadManifest } from "./targets.js";
 import { demosToFeatureTypes } from "../probes/helpers/d5-feature-mapping.js";
 
 /** The two fleet levels this runner can drive. */
@@ -177,15 +177,19 @@ export function buildLocalServicesJson(
   if (fromEnv && fromEnv.trim().length > 0) {
     return fromEnv;
   }
-  const records = scopes.map(({ slug, demo }) => ({
-    name: `showcase-${slug}`,
-    publicUrl: `http://${slug}:10000`,
-    demos: demo
-      ? [demo]
-      : level === "d5"
-        ? ["agentic-chat"]
-        : demosForSlug(slug, config),
-  }));
+  const records = scopes.map(({ slug, demo }) => {
+    const manifest = loadManifest(slug, config);
+    return {
+      name: `showcase-${slug}`,
+      publicUrl: `http://${slug}:10000`,
+      demos: demo
+        ? [demo]
+        : level === "d5"
+          ? ["agentic-chat"]
+          : demosForSlug(slug, config),
+      notSupportedFeatures: manifest.not_supported_features,
+    };
+  });
   return JSON.stringify(records);
 }
 

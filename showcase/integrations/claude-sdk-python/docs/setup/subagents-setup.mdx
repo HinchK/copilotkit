@@ -1,0 +1,21 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    pip install claude-agent-sdk ag-ui-claude-sdk ag-ui-protocol anthropic
+    ```
+
+  </Step>
+  <Step>
+    ### Expose sub-agents as supervisor tools
+
+    The supervisor defines each sub-agent as a tool. When Claude calls one,
+    the backend makes a focused secondary Claude request, records the
+    delegation in shared state, and returns the sub-agent output to the
+    supervisor.
+
+    <DemoCode file="src/agents/subagents_agent.py" region="supervisor-delegation-tools" />
+
+  </Step>
+</Steps>

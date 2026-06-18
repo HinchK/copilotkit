@@ -7,18 +7,20 @@
  * so the declarative-render system prompt cannot leak into other demos.
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import {
   CopilotRuntime,
   ExperimentalEmptyAdapter,
   copilotRuntimeNextJSAppRouterEndpoint,
 } from "@copilotkit/runtime";
-import { AbstractAgent, HttpAgent } from "@ag-ui/client";
+import type { AbstractAgent } from "@ag-ui/client";
+import { HttpAgent } from "@ag-ui/client";
 
 const AGENT_URL = process.env.AGENT_URL || "http://localhost:8000";
 
 const agents: Record<string, AbstractAgent> = {
-  declarative_json_render: new HttpAgent({
+  byoc_json_render: new HttpAgent({
     url: `${AGENT_URL}/byoc-json-render`,
   }),
 };

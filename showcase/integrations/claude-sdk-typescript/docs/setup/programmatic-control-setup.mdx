@@ -1,0 +1,20 @@
+<Steps>
+  <Step>
+    ### Install the Claude Agent SDK adapter
+
+    ```bash
+    npm install @ag-ui/claude-agent-sdk @ag-ui/core @ag-ui/encoder @anthropic-ai/claude-agent-sdk @anthropic-ai/sdk
+    ```
+
+  </Step>
+  <Step>
+    ### Use the same AG-UI agent for headless runs
+
+    Programmatic APIs such as `agent.subscribe`, `agent.addMessage`, and
+    `agent.runAgent` drive the same AG-UI run loop as the prebuilt chat UI.
+    Keep the backend wiring on the official Claude adapter.
+
+    <DemoCode file="src/claude-agent-sdk-adapter.ts" region="claude-agent-sdk-agent-setup" />
+
+  </Step>
+</Steps>
