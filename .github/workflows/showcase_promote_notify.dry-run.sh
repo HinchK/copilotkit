@@ -19,6 +19,35 @@
 # (notify workflow aborts gracefully — we treat that as a non-fatal but
 # distinct exit so callers can assert on it).
 
+# ---------- alert post-and-verify predicate (shared with the workflow) ----------
+# Slack returns HTTP 200 with `{"ok":false,"error":"..."}` on LOGICAL failures
+# (channel_not_found, not_in_channel, ...). A failure-ALERT that is silently
+# dropped pages nobody, so the live workflow MUST surface it. This predicate is
+# the testable core of that surfacing logic: it inspects a captured Slack
+# response and, when the post did NOT succeed, emits a GitHub `::warning::`
+# (matching the workflow's existing `::warning::`/`>&2` idiom) and returns 1.
+#
+# Sourcing this script (e.g. from bats) defines this function without running
+# the dry-run body — see the EXECUTION GUARD at the bottom.
+#   $1 = label for the warning (e.g. "thread reply", "#oss-alerts cross-post")
+#   $2 = captured Slack API response body (JSON, or "{}" on transport failure)
+slack_alert_posted_ok() {
+  local label="$1"
+  local resp="$2"
+  local ok
+  ok=$(printf '%s' "$resp" | jq -r '.ok // false' 2>/dev/null || echo false)
+  if [ "$ok" != "true" ]; then
+    local err
+    err=$(printf '%s' "$resp" | jq -r '.error // "unknown"' 2>/dev/null || echo unknown)
+    echo "::warning::Slack ${label} did NOT post (ok=${ok} error=${err}); failure alert may have been dropped" >&2
+    return 1
+  fi
+  return 0
+}
+
+# EXECUTION GUARD: when sourced (BASH_SOURCE[0] != $0) define functions only.
+(return 0 2>/dev/null) && return 0
+
 set -euo pipefail
 
 if [ "${1:-}" = "" ]; then
@@ -79,8 +108,6 @@ elapsed=$(jq -r '(.elapsed_seconds // 0) | tonumber? // 0 | floor' "$R")
 pre_staging=$(jq -r '.pre_staging // "skipped"' "$R")
 abort_reason=$(jq -r '.abort_reason // ""' "$R")
 succeeded_count=$(jq -r '.succeeded | length' "$R")
-# shellcheck disable=SC2034  # retained for parity with workflow (internal logging only)
-failed_count=$(jq -r '.failed | length' "$R")
 
 jq '.failed | sort_by(.service)' "$R" > /tmp/dry-run-failed-sorted.json
 jq '[.[] | select(.category != "truncation-suffix")]' /tmp/dry-run-failed-sorted.json > /tmp/dry-run-failed-render.json
@@ -91,7 +118,6 @@ truncation_more=$(jq -r '[.[] | select(.category == "truncation-suffix") | .serv
 #   succeeded_count    = raw .succeeded length
 #   failed_real_count  = .failed length minus truncation-suffix sentinels
 #                        (rendered to operators on all display lines)
-#   failed_count       = raw .failed length (internal logging only)
 failed_real_count=$(jq 'length' /tmp/dry-run-failed-render.json)
 
 total_count=$((succeeded_count + failed_real_count))
