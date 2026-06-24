@@ -70,4 +70,72 @@ describe("injectMemories", () => {
     });
     expect(controller.memories().map((m) => m.content)).toEqual(["user pref"]);
   });
+
+  it("excludes invalidated memories by default", async () => {
+    const { copilotkit } = setup();
+    const controller = TestBed.runInInjectionContext(() =>
+      injectMemories({ agentId: "agent-1" }),
+    );
+
+    // A normal (non-invalidated) memory must be visible in both branches.
+    await controller.addMemory({
+      kind: "topical",
+      scope: "user",
+      content: "live fact",
+    });
+
+    // Simulate a retired memory arriving via the realtime seam.
+    const store = copilotkit.core.getMemoryStore("agent-1") as unknown as {
+      ɵemitMetadataEvent: (e: unknown) => void;
+    };
+    store.ɵemitMetadataEvent({
+      operation: "created",
+      memory: {
+        id: "retired-1",
+        kind: "topical",
+        scope: "user",
+        content: "old fact",
+        sourceThreadIds: [],
+        invalidatedAt: "2026-01-01T00:00:00Z",
+      },
+    });
+
+    const ids = controller.memories().map((m) => m.id);
+    expect(ids).not.toContain("retired-1");
+    expect(controller.memories().map((m) => m.content)).toContain("live fact");
+  });
+
+  it("includes invalidated memories when includeInvalidated is true", async () => {
+    const { copilotkit } = setup();
+    const controller = TestBed.runInInjectionContext(() =>
+      injectMemories({ agentId: "agent-1", includeInvalidated: true }),
+    );
+
+    // A normal (non-invalidated) memory must also be visible.
+    await controller.addMemory({
+      kind: "topical",
+      scope: "user",
+      content: "live fact",
+    });
+
+    // Same retired memory as the previous test.
+    const store = copilotkit.core.getMemoryStore("agent-1") as unknown as {
+      ɵemitMetadataEvent: (e: unknown) => void;
+    };
+    store.ɵemitMetadataEvent({
+      operation: "created",
+      memory: {
+        id: "retired-1",
+        kind: "topical",
+        scope: "user",
+        content: "old fact",
+        sourceThreadIds: [],
+        invalidatedAt: "2026-01-01T00:00:00Z",
+      },
+    });
+
+    const ids = controller.memories().map((m) => m.id);
+    expect(ids).toContain("retired-1");
+    expect(controller.memories().map((m) => m.content)).toContain("live fact");
+  });
 });
