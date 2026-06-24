@@ -1,7 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCopilotKit } from "../../context";
-import { ɵcreateMemoryStore } from "@copilotkit/core";
 import type { ɵMemoryStore } from "@copilotkit/core";
 import { useMemories } from "../use-memories";
 
