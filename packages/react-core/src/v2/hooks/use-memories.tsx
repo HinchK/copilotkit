@@ -78,7 +78,8 @@ export function useMemories({
   const { copilotkit } = useCopilotKit();
 
   const [store] = useState(() =>
-    ɵcreateMemoryStore({ fetch: globalThis.fetch }),
+    // bound to its receiver so the (eventual transport-backed) store can invoke it safely
+    ɵcreateMemoryStore({ fetch: globalThis.fetch.bind(globalThis) }),
   );
 
   const allMemories = useMemoryStoreSelector(store, ɵselectMemories);
