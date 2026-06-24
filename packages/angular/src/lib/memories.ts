@@ -52,9 +52,24 @@ export function injectMemories(
   const destroyRef = inject(DestroyRef);
   const { agentId, scope, includeInvalidated } = params;
 
-  const store = ɵcreateMemoryStore({ fetch: globalThis.fetch });
+  // Bind to globalThis so the eventual transport-backed store can invoke it
+  // safely regardless of how it is called internally (no behavior change today
+  // as the mock ignores fetch).
+  const store = ɵcreateMemoryStore({
+    fetch: globalThis.fetch.bind(globalThis),
+  });
   copilotkit.core.registerMemoryStore(agentId, store);
   store.start();
+
+  // Register cleanup immediately after start so teardown is guaranteed even if
+  // any of the bridge setup below throws.
+  destroyRef.onDestroy(() => {
+    store.stop();
+    copilotkit.core.unregisterMemoryStore(agentId);
+  });
+
+  // TODO(RD-34 integration): dispatch runtime context + gate on
+  // runtimeConnectionStatus once the transport-backed store lands.
 
   const allMemories = toSignal(store.select(ɵselectMemories), {
     initialValue: store.getState().memories,
@@ -73,14 +88,6 @@ export function injectMemories(
       return true;
     }),
   );
-
-  destroyRef.onDestroy(() => {
-    store.stop();
-    copilotkit.core.unregisterMemoryStore(agentId);
-  });
-
-  // TODO(RD-34 integration): dispatch runtime context + gate on
-  // runtimeConnectionStatus once the transport-backed store lands.
 
   return {
     memories,
