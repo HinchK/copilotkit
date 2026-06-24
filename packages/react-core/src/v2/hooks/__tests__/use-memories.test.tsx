@@ -89,6 +89,77 @@ describe("useMemories", () => {
     );
   });
 
+  it("excludes invalidated memories by default", async () => {
+    const { result } = renderHook(() => useMemories({ agentId: "agent-1" }));
+    act(() => {
+      // Emit a normal memory first so we can verify the toggle matters, not an
+      // unrelated effect.
+      (registered["agent-1"] as any).ɵemitMetadataEvent({
+        operation: "created",
+        memory: {
+          id: "active-1",
+          kind: "topical",
+          scope: "user",
+          content: "current fact",
+          sourceThreadIds: [],
+          invalidatedAt: null,
+        },
+      });
+      (registered["agent-1"] as any).ɵemitMetadataEvent({
+        operation: "created",
+        memory: {
+          id: "retired-1",
+          kind: "topical",
+          scope: "user",
+          content: "old fact",
+          sourceThreadIds: [],
+          invalidatedAt: "2026-01-01T00:00:00Z",
+        },
+      });
+    });
+    await waitFor(() => {
+      const ids = result.current.memories.map((m) => m.id);
+      expect(ids).toContain("active-1");
+      expect(ids).not.toContain("retired-1");
+    });
+  });
+
+  it("includes invalidated memories when includeInvalidated is true", async () => {
+    const { result } = renderHook(() =>
+      useMemories({ agentId: "agent-1", includeInvalidated: true }),
+    );
+    act(() => {
+      // Emit a normal memory alongside the retired one to confirm both appear.
+      (registered["agent-1"] as any).ɵemitMetadataEvent({
+        operation: "created",
+        memory: {
+          id: "active-1",
+          kind: "topical",
+          scope: "user",
+          content: "current fact",
+          sourceThreadIds: [],
+          invalidatedAt: null,
+        },
+      });
+      (registered["agent-1"] as any).ɵemitMetadataEvent({
+        operation: "created",
+        memory: {
+          id: "retired-1",
+          kind: "topical",
+          scope: "user",
+          content: "old fact",
+          sourceThreadIds: [],
+          invalidatedAt: "2026-01-01T00:00:00Z",
+        },
+      });
+    });
+    await waitFor(() => {
+      const ids = result.current.memories.map((m) => m.id);
+      expect(ids).toContain("active-1");
+      expect(ids).toContain("retired-1");
+    });
+  });
+
   it("filters by scope when scope is provided", async () => {
     const { result } = renderHook(() =>
       useMemories({ agentId: "agent-1", scope: "user" }),
